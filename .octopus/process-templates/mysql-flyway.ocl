@@ -25,6 +25,14 @@ parameter "ProcessTemplate.Approval.Team" {
     label = "Approval Team"
 }
 
+parameter "ProcessTemplate.Flyway.Package" {
+    display_settings = {
+        Octopus.ControlType = "Package"
+    }
+    help_text = "This package contains the files used by Flyway to perform database migrations."
+    label = "Flyway Package"
+}
+
 step "mysql-create-database-if-not-exists" {
     name = "MySQL - Create Database If Not Exists"
 
