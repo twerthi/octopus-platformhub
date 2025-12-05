@@ -39,6 +39,8 @@ parameter "ProcessTemplate.Jdbc.Connection.String" {
     }
     help_text = "The JDBC connection string for the database."
     label = "JDBC Connection String"
+
+    value "jdbc:mysql://#{ProcessTemplate.Database.Server.Name}:#{ProcessTemplate.Database.Server.Port}/#{ProcessTemplate.Database.Name}?useUnicode=true" {}
 }
 
 parameter "ProcessTemplate.Database.Authentication.User.Name" {
@@ -72,6 +74,30 @@ parameter "ProcessTemplate.Database.Authentication.Method" {
     }
     help_text = "Choose the authentication method used to connect to the database."
     label = "Authentication Method"
+}
+
+parameter "ProcessTemplate.Database.Server.Name" {
+    display_settings = {
+        Octopus.ControlType = "SingleLineText"
+    }
+    help_text = "Name or IP address of the database server."
+    label = "Database Server Name"
+}
+
+parameter "ProcessTemplate.Database.Name" {
+    display_settings = {
+        Octopus.ControlType = "SingleLineText"
+    }
+    help_text = "Name of the database to deploy to."
+    label = "Database Name"
+}
+
+parameter "ProcessTemplate.Database.Server.Port" {
+    display_settings = {
+        Octopus.ControlType = "SingleLineText"
+    }
+    help_text = "Port number that the database server is listening on."
+    label = "Database Server Port"
 }
 
 step "mysql-create-database-if-not-exists" {
