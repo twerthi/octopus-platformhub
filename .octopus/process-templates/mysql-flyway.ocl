@@ -1610,7 +1610,7 @@ step "flyway-database-migrations" {
     action {
         action_type = "Octopus.Script"
         properties = {
-            Flyway.Authentication.Method = "#{ProcessTemplate.Database.Authentication.Method}usernamepassword"
+            Flyway.Authentication.Method = "#{ProcessTemplate.Database.Authentication.Method}"
             Flyway.Command.BaseLineOnMigrate = "false"
             Flyway.Command.FailOnDrift = "true"
             Flyway.Command.OutOfOrder = "false"
