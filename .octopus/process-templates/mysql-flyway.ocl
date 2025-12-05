@@ -1,12 +1,12 @@
 name = "MySQL-Flyway"
 description = "Process template to perform Flyway deployments to MySQL."
 
-parameter "Production Environment" {
+parameter "ProcessTemplate.Environment" {
     display_settings = {
         Octopus.ControlType = "Environments"
     }
-    help_text = ""
-    label = ""
+    help_text = "The environment(s) that require the manual intervention step."
+    label = "Approval Environment"
 }
 
 parameter "ProcessTemplate.WorkerPool" {
@@ -1849,6 +1849,8 @@ step "flyway-database-migrations-info" {
 
         packages "Flyway.Package.Value" {
             acquisition_location = "Server"
+            feed = "octopus-server-built-in"
+            package_id = ""
             properties = {
                 Extract = "True"
                 PackageParameterName = "Flyway.Package.Value"
@@ -3015,6 +3017,8 @@ step "flyway-database-migrations" {
 
         packages "Flyway.Package.Value" {
             acquisition_location = "Server"
+            feed = "octopus-server-built-in"
+            package_id = ""
             properties = {
                 Extract = "True"
                 PackageParameterName = "Flyway.Package.Value"
