@@ -446,6 +446,7 @@ step "flyway-database-migrations-info" {
             Flyway.Command.Target = "latest"
             Flyway.Command.Value = "info"
             Flyway.Package.Value = "ProcessTemplate.Flyway.Package"
+            Flyway.Target.Url = "#{ProcessTemplate.Jdbc.Connection.String}"
             Octopus.Action.EnabledFeatures = "Octopus.Features.SelectPowerShellEditionForWindows"
             Octopus.Action.PowerShell.Edition = "Core"
             Octopus.Action.RunOnServer = "true"
