@@ -33,6 +33,47 @@ parameter "ProcessTemplate.Flyway.Package" {
     label = "Flyway Package"
 }
 
+parameter "ProcessTemplate.Jdbc.Connection.String" {
+    display_settings = {
+        Octopus.ControlType = "SingleLineText"
+    }
+    help_text = "The JDBC connection string for the database."
+    label = "JDBC Connection String"
+}
+
+parameter "ProcessTemplate.Database.Authentication.User.Name" {
+    display_settings = {
+        Octopus.ControlType = "SingleLineText"
+    }
+    help_text = "(Optional) The database username to use for the connection, leave blank if using other authentication methods."
+    is_optional = true
+    label = "Database Username"
+}
+
+parameter "ProcessTemplate.Database.Authentication.User.Password" {
+    display_settings = {
+        Octopus.ControlType = "Sensitive"
+    }
+    help_text = "(Optional) The password for the database username to use for the connection, leave blank if using other authentication methods."
+    is_optional = true
+    label = "Database User Password"
+}
+
+parameter "ProcessTemplate.Database.Authentication.Method" {
+    display_settings = {
+        Octopus.ControlType = "Select"
+        Octopus.SelectOptions = <<-EOT
+            awsiam|AWS EC2 IAM Role
+            azuremanagedidentity|Azure Managed Identity
+            gcpserviceaccount|GCP Service Account
+            usernamepassword|Username\Password
+            windowsauthentication|Windows Authentication
+            EOT
+    }
+    help_text = "Choose the authentication method used to connect to the database."
+    label = "Authentication Method"
+}
+
 step "mysql-create-database-if-not-exists" {
     name = "MySQL - Create Database If Not Exists"
 
@@ -721,13 +762,13 @@ step "flyway-database-migrations-info" {
     action {
         action_type = "Octopus.Script"
         properties = {
-            Flyway.Authentication.Method = "usernamepassword"
+            Flyway.Authentication.Method = "#{ProcessTemplate.Database.Authentication.Method}"
             Flyway.Command.BaseLineOnMigrate = "false"
             Flyway.Command.FailOnDrift = "true"
             Flyway.Command.OutOfOrder = "false"
             Flyway.Command.SkipExecutingMigrations = "false"
             Flyway.Command.Target = "latest"
-            Flyway.Command.Value = "migrate"
+            Flyway.Command.Value = "info"
             Flyway.Package.Value = "ProcessTemplate.Flyway.Package"
             Octopus.Action.EnabledFeatures = "Octopus.Features.SelectPowerShellEditionForWindows"
             Octopus.Action.PowerShell.Edition = "Core"
