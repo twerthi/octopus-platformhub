@@ -1594,7 +1594,7 @@ step "manual-intervention-required" {
 
     action {
         action_type = "Octopus.Manual"
-        excluded_environments_variable = "#{Production Environment}"
+        excluded_environments_variable = "#{ProcessTemplate.Environment}"
         is_required = true
         properties = {
             Octopus.Action.Manual.BlockConcurrentDeployments = "False"
