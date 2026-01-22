@@ -1,0 +1,18 @@
+name = "Check for Attestation"
+violation_action = "block"
+
+conditions {
+    rego = <<-EOT
+            package check_for_attestation
+            
+            default result := {"allowed": true}
+            EOT
+}
+
+scope {
+    rego = <<-EOT
+            package check_for_attestation
+            
+            default evaluate := true
+            EOT
+}
