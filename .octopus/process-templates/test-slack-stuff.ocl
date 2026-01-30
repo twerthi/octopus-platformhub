@@ -46,13 +46,13 @@ step "slack-detailed-notification" {
             HookUrl = "#{Template.Slack.Webook.Url}"
             IconUrl = "https://octopus.com/content/resources/favicon.png"
             IncludeErrorMessageOnFailure = "false"
-            IncludeFieldEnvironment = "false"
+            IncludeFieldEnvironment = "True"
             IncludeFieldMachine = "false"
             IncludeFieldRelease = "false"
             IncludeFieldReleaseNotes = "false"
             IncludeFieldTenant = "false"
             IncludeFieldUsername = "false"
-            IncludeLinkOnFailure = "false"
+            IncludeLinkOnFailure = "True"
             Octopus.Action.RunOnServer = "true"
             Octopus.Action.Script.ScriptBody = <<-EOT
                 function Slack-Populate-StatusInfo ([boolean] $Success = $true) {
