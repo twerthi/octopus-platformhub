@@ -1,2 +1,414 @@
 name = "Test Slack stuff"
 description = ""
+
+parameter "Template.Worker.Pool" {
+    display_settings = {
+        Octopus.ControlType = "WorkerPool"
+    }
+    help_text = ""
+    label = "Worker pool"
+}
+
+parameter "Template.Slack.Webook.Url" {
+    display_settings = {
+        Octopus.ControlType = "Sensitive"
+    }
+    help_text = ""
+    label = "Slack webhook url"
+}
+
+parameter "Template.Slack.Channel.Handle" {
+    display_settings = {
+        Octopus.ControlType = "SingleLineText"
+    }
+    help_text = ""
+    label = "Slack channel handle"
+}
+
+parameter "Template.Octopus.Url" {
+    display_settings = {
+        Octopus.ControlType = "SingleLineText"
+    }
+    help_text = ""
+    label = "Octopus URL"
+
+    value "#{Octopus.Web.BaseUrl}" {}
+}
+
+step "slack-detailed-notification" {
+    name = "Slack - Detailed Notification"
+
+    action {
+        action_type = "Octopus.Script"
+        properties = {
+            Channel = "#{Template.Slack.Channel.Handle}"
+            DeploymentInfoText = "#{Octopus.Project.Name} release #{Octopus.Release.Number} to #{Octopus.Environment.Name} (#{Octopus.Machine.Name})"
+            HookUrl = "#{Template.Slack.Webook.Url}"
+            IconUrl = "https://octopus.com/content/resources/favicon.png"
+            IncludeErrorMessageOnFailure = "false"
+            IncludeFieldEnvironment = "false"
+            IncludeFieldMachine = "false"
+            IncludeFieldRelease = "false"
+            IncludeFieldReleaseNotes = "false"
+            IncludeFieldTenant = "false"
+            IncludeFieldUsername = "false"
+            IncludeLinkOnFailure = "false"
+            Octopus.Action.RunOnServer = "true"
+            Octopus.Action.Script.ScriptBody = <<-EOT
+                function Slack-Populate-StatusInfo ([boolean] $Success = $true) {
+                
+                	$deployment_info = $OctopusParameters['DeploymentInfoText'];
+                	
+                	if ($Success){
+                		$status_info = @{
+                			color = "good";
+                			
+                			title = "Success";
+                			message = "$deployment_info";
+                
+                			fallback = "Deployed successfully $deployment_info";
+                			
+                			success = $Success;
+                		}
+                	} else {
+                		$status_info = @{
+                			color = "danger";
+                			
+                			title = "Failed";			
+                			message = "$deployment_info";
+                
+                			fallback = "Failed to deploy $deployment_info";	
+                			
+                			success = $Success;
+                		}
+                	}
+                	
+                	return $status_info;
+                }
+                
+                function Slack-Populate-Fields ($StatusInfo) {
+                
+                	# We use += instead of .Add() to prevent returning values returned by .Add() function
+                	# it clutters the code, but seems the easiest solution here
+                	
+                	$fields = @()
+                	
+                	$fields += 
+                		@{
+                			title = $StatusInfo.title;
+                			value = $StatusInfo.message;
+                		}
+                	;
+                
+                	$IncludeFieldEnvironment = [boolean]::Parse($OctopusParameters['IncludeFieldEnvironment'])
+                	if ($IncludeFieldEnvironment) {
+                		$fields += 
+                			@{
+                				title = "Environment";
+                				value = $OctopusEnvironmentName;
+                				short = "true";
+                			}
+                		;	
+                	}
+                
+                
+                	$IncludeFieldMachine = [boolean]::Parse($OctopusParameters['IncludeFieldMachine'])
+                	if ($IncludeFieldMachine) {
+                		$fields += 
+                			@{
+                				title = "Machine";
+                				value = $OctopusParameters['Octopus.Machine.Name'];
+                				short = "true";
+                			}
+                		;	
+                	}	
+                	
+                	$IncludeFieldTenant = [boolean]::Parse($OctopusParameters['IncludeFieldTenant'])
+                	if ($IncludeFieldTenant) {
+                		$fields += 
+                			@{
+                				title = "Tenant";
+                				value = $OctopusParameters['Octopus.Deployment.Tenant.Name'];
+                				short = "true";
+                			}
+                		;	
+                	}	
+                	
+                		$IncludeFieldUsername = [boolean]::Parse($OctopusParameters['IncludeFieldUsername'])
+                	if ($IncludeFieldUsername) {
+                		$fields += 
+                			@{
+                				title = "Username";
+                				value = $OctopusParameters['Octopus.Deployment.CreatedBy.Username'];
+                				short = "true";
+                			}
+                		;	
+                	}	
+                	
+                	$IncludeFieldRelease = [boolean]::Parse($OctopusParameters['IncludeFieldRelease'])
+                	if ($IncludeFieldRelease) {
+                		$fields += 
+                			@{
+                				title = "Release";
+                				value = $OctopusReleaseNumber;
+                				short = "true";
+                			}
+                		;	
+                	}
+                	
+                	
+                	$IncludeFieldReleaseNotes = [boolean]::Parse($OctopusParameters['IncludeFieldReleaseNotes'])
+                	if ($StatusInfo["success"] -and $IncludeFieldReleaseNotes) {
+                	
+                		
+                		$link = $OctopusParameters['Octopus.Web.ReleaseLink'];
+                		$baseurl = $OctopusParameters['OctopusBaseUrl'];
+                		
+                		$notes = $OctopusReleaseNotes
+                		
+                		if ($notes.Length -gt 300) {
+                			$shortened = $OctopusReleaseNotes.Substring(0,300);
+                			$notes = "$shortened `n `<${baseurl}${link}|view all changes`>"
+                		}
+                		
+                		$fields +=  
+                			@{
+                				title = "Changes in this release";
+                				value = $notes;
+                			}
+                		;	
+                	}	
+                	
+                	#failure fields
+                	
+                	$IncludeErrorMessageOnFailure = [boolean]::Parse($OctopusParameters['IncludeErrorMessageOnFailure'])
+                	if (-not  $StatusInfo["success"] -and $IncludeErrorMessageOnFailure) {
+                			
+                		$fields += 
+                			@{
+                				title = "Error text";
+                				value = $OctopusParameters['Octopus.Deployment.Error'];
+                			}
+                		;	
+                	}	
+                		
+                
+                	$IncludeLinkOnFailure = [boolean]::Parse($OctopusParameters['IncludeLinkOnFailure'])
+                	if (-not $StatusInfo["success"] -and $IncludeLinkOnFailure) {
+                		
+                		$link = $OctopusParameters['Octopus.Web.DeploymentLink'];
+                		$baseurl = $OctopusParameters['OctopusBaseUrl'];
+                	
+                		$fields += 
+                			@{
+                				title = "See the process";
+                				value = "`<${baseurl}${link}|Open process page`>";
+                				short = "true";
+                			}
+                		;	
+                	}
+                	
+                	
+                	return $fields;
+                	
+                }
+                
+                function Slack-Rich-Notification ($Success)
+                {
+                    $status_info = Slack-Populate-StatusInfo -Success $Success
+                	$fields = Slack-Populate-Fields -StatusInfo $status_info
+                
+                	
+                	$payload = @{
+                        channel = $OctopusParameters['Channel']
+                        username = $OctopusParameters['Username'];
+                        icon_url = $OctopusParameters['IconUrl'];
+                		
+                        attachments = @(
+                            @{
+                				fallback = $status_info["fallback"];
+                				color = $status_info["color"];
+                			
+                				fields = $fields
+                            };
+                        );
+                    }
+                	
+                	#We unescape here to allow links in the Json, as ConvertTo-Json escapes <,> and other special symbols
+                	$json_body = ($payload | ConvertTo-Json -Depth 4 | % { [System.Text.RegularExpressions.Regex]::Unescape($_) });
+                	
+                	
+                    try {
+                    	$invokeParameters = @{}
+                        $invokeParameters.Add("Method", "POST")
+                        $invokeParameters.Add("Body", $json_body)
+                        $invokeParameters.Add("Uri", $OctopusParameters['HookUrl'])
+                        $invokeParameters.Add("ContentType", "application/json")
+                        
+                            # Check for UseBasicParsing
+                        if ((Get-Command Invoke-RestMethod).Parameters.ContainsKey("UseBasicParsing"))
+                        {
+                            # Add the basic parsing argument
+                            $invokeParameters.Add("UseBasicParsing", $true)
+                        }
+                
+                        
+                        [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+                        Invoke-RestMethod @invokeParameters
+                        
+                    } catch {
+                        echo "Something occured"
+                        echo  $_.Exception
+                        echo  $_
+                        #echo $json_body
+                        throw
+                    }
+                    
+                }
+                
+                
+                
+                $success = ($OctopusParameters['Octopus.Deployment.Error'] -eq $null);
+                
+                Slack-Rich-Notification -Success $success
+                
+                EOT
+            Octopus.Action.Script.ScriptSource = "Inline"
+            Octopus.Action.Script.Syntax = "PowerShell"
+            OctopusBaseUrl = "#{Template.Octopus.Url}"
+            Username = "Octopus Deploy"
+        }
+        worker_pool_variable = "#{Template.Worker.Pool}"
+
+        community_action_template_snapshot {
+            id = "CommunityActionTemplates-234"
+            version = 11
+
+            parameter "HookUrl" {
+                display_settings = {
+                    Octopus.ControlType = "Sensitive"
+                }
+                help_text = "The Webhook URL provided by Slack, including token."
+                label = "Webhook URL"
+                default_value = ""
+            }
+
+            parameter "Channel" {
+                display_settings = {
+                    Octopus.ControlType = "SingleLineText"
+                }
+                help_text = "Which Slack channel to post notifications to."
+                label = "Channel handle"
+                default_value = ""
+            }
+
+            parameter "IconUrl" {
+                display_settings = {
+                    Octopus.ControlType = "SingleLineText"
+                }
+                help_text = "The icon to use for this user in Slack"
+                label = "Icon URL"
+                default_value = "https://octopus.com/content/resources/favicon.png"
+            }
+
+            parameter "Username" {
+                display_settings = {
+                    Octopus.ControlType = "SingleLineText"
+                }
+                help_text = "The username shown in Slack against these notifications"
+                label = ""
+                default_value = "Octopus Deploy"
+            }
+
+            parameter "DeploymentInfoText" {
+                display_settings = {
+                    Octopus.ControlType = "MultiLineText"
+                }
+                help_text = "Long information message shown in slack. This message is prefixed with \"Deployed successfully\" or \"Failed to deploy\" depending on status."
+                label = "Main message"
+                default_value = "#{Octopus.Project.Name} release #{Octopus.Release.Number} to #{Octopus.Environment.Name} (#{Octopus.Machine.Name})"
+            }
+
+            parameter "IncludeFieldRelease" {
+                display_settings = {
+                    Octopus.ControlType = "Checkbox"
+                }
+                help_text = "Shows short field with release number name"
+                label = "Include release number field"
+                default_value = "false"
+            }
+
+            parameter "IncludeFieldReleaseNotes" {
+                display_settings = {
+                    Octopus.ControlType = "Checkbox"
+                }
+                help_text = "Release notes are only included on successful deployment"
+                label = "Include release notes Field"
+                default_value = "false"
+            }
+
+            parameter "IncludeFieldMachine" {
+                display_settings = {
+                    Octopus.ControlType = "Checkbox"
+                }
+                help_text = "Shows short field with machine name"
+                label = "Include machine name field"
+                default_value = "false"
+            }
+
+            parameter "IncludeFieldEnvironment" {
+                display_settings = {
+                    Octopus.ControlType = "Checkbox"
+                }
+                help_text = "Shows short field with environment name"
+                label = "Include environment name field"
+                default_value = "false"
+            }
+
+            parameter "IncludeFieldTenant" {
+                display_settings = {
+                    Octopus.ControlType = "Checkbox"
+                }
+                help_text = "Shows short field with name of tenant"
+                label = "Include tenant name field"
+                default_value = "false"
+            }
+
+            parameter "IncludeFieldUsername" {
+                display_settings = {
+                    Octopus.ControlType = "Checkbox"
+                }
+                help_text = "Shows the username of user that initiated deployment"
+                label = "Include username field"
+                default_value = "false"
+            }
+
+            parameter "IncludeLinkOnFailure" {
+                display_settings = {
+                    Octopus.ControlType = "Checkbox"
+                }
+                help_text = "When deployment failed a link \"Open process page\" is added to the notification pointing to deployment process page"
+                label = "Include deployment process link on failure"
+                default_value = "false"
+            }
+
+            parameter "IncludeErrorMessageOnFailure" {
+                display_settings = {
+                    Octopus.ControlType = "Checkbox"
+                }
+                help_text = "When deployment failed error text is shown as part of notification"
+                label = "Include error message text on failure"
+                default_value = "false"
+            }
+
+            parameter "OctopusBaseUrl" {
+                display_settings = {
+                    Octopus.ControlType = "SingleLineText"
+                }
+                help_text = "Base URL to add to the links in the notification. If octopus server dashboard is at \"http://octopus/app\" include all before the \"app\" part (\"http://octopus\")."
+                label = "Octopus base url"
+                default_value = ""
+            }
+        }
+    }
+}
