@@ -1,0 +1,53 @@
+name = "Don't allow prerelease templates to be used in production deployments"
+violation_action = "warn"
+
+scope {
+    rego = <<-EOT
+        package no_prerelease_templates_to_production
+
+        evaluate if { 
+            input.Release
+        }
+    EOT
+}
+
+conditions {
+    rego = <<-EOT
+        package no_prerelease_templates_to_production
+
+        default result := {"allowed": false}
+
+        result := {"allowed": false, "action": "block"} if {
+            production
+            contains_prerelease_step
+        }
+
+        result := {"allowed": false, "action": "block"} if {
+            staging
+            contains_prerelease_step
+        }
+
+        result := {"allowed": false} if {
+            not production
+            not staging
+            contains_prerelease_step
+        }
+
+        result := {"allowed": true} if {
+            not contains_prerelease_step
+        }
+
+        production if {
+            input.Environment.Slug == "production"
+        }
+
+        staging if {
+            input.Environment.Slug == "staging"
+        }
+
+        contains_prerelease_step if {
+            some step in input.Steps
+            contains(step.Source.Version, "prerelease")
+        }
+    EOT
+}
