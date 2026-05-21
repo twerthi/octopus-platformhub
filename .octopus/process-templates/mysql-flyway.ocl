@@ -1,6 +1,11 @@
 name = "MySQL-Flyway"
 description = "Process template to perform Flyway deployments to MySQL."
 
+icon {
+    color = "#1A77CA"
+    id = "database"
+}
+
 parameter "ProcessTemplate.Environment" {
     display_settings = {
         Octopus.ControlType = "Environments"
