@@ -1589,6 +1589,11 @@ step "flyway-database-migrations-info" {
             }
         }
 
+        container {
+            feed = "#{ProcessTemplate.Container.Feed}"
+            image = "octopuslabs/flyway-tools"
+        }
+
         packages "Flyway.Package.Value" {
             acquisition_location = "Server"
             feed = "octopus-server-built-in"
