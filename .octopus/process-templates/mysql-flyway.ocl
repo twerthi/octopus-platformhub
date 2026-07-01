@@ -1591,7 +1591,7 @@ step "flyway-database-migrations-info" {
 
         container {
             feed = "#{ProcessTemplate.Container.Feed}"
-            image = "octopuslabs/flyway-tools"
+            image = "octopuslabs/flyway-workertools"
         }
 
         packages "Flyway.Package.Value" {
