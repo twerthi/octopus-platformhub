@@ -105,6 +105,14 @@ parameter "ProcessTemplate.Database.Server.Port" {
     label = "Database Server Port"
 }
 
+parameter "ProcessTemplate.Container.Feed" {
+    display_settings = {
+        Octopus.ControlType = "Feed"
+    }
+    help_text = "Select the Docker registry to pull from."
+    label = "Container Feed"
+}
+
 step "mysql-create-database-if-not-exists" {
     name = "MySQL - Create Database If Not Exists"
 
