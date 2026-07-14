@@ -45,6 +45,14 @@ step "deploy-a-helm-chart" {
         properties = {
             Octopus.Action.Helm.Namespace = "#{Project.Namespace.Name}"
             Octopus.Action.Helm.ResetValues = "True"
+            Octopus.Action.Helm.TemplateValuesSources = <<-EOT
+                [
+                  {
+                    "Type": "InlineYaml",
+                    "Value": "image:\n  repository: #{Octopus.Action.Package[octopub-frontend].PackageId}\n  tag: #{Octopus.Action.Package[octopub-frontend].PackageVersion}"
+                  }
+                ]
+                EOT
             Octopus.Action.Kubernetes.ResourceStatusCheck = "True"
             Octopus.Action.Script.ScriptSource = "Package"
         }
@@ -52,9 +60,12 @@ step "deploy-a-helm-chart" {
 
         packages {
             acquisition_location = "Server"
+            feed = "octopus-server-built-in"
+            package_id = ""
             properties = {
                 PackageParameterName = "ProjectTemplate.Helm.Chart.Package"
                 SelectionMode = "deferred"
+                ValuesFilePath = ""
             }
         }
     }
