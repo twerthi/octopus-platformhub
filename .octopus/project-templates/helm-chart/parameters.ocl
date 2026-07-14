@@ -19,5 +19,5 @@ parameter "ProjectTemplate.Helm.Target.Tags" {
         Octopus.ControlType = "TargetTags"
     }
     help_text = "Enter the target tags for the steps."
-    label = "Target Tags"
+    label = "Helm Target Tags"
 }
