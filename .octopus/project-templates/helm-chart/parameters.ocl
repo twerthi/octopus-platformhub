@@ -1,0 +1,15 @@
+parameter "ProjectTemplate.Helm.Chart.Package" {
+    display_settings = {
+        Octopus.ControlType = "Package"
+    }
+    help_text = "Select the container image to deploy."
+    label = "Container Image"
+}
+
+parameter "ProjectTemplate.Container.Feed" {
+    display_settings = {
+        Octopus.ControlType = "Feed"
+    }
+    help_text = "Select the registry for the container image."
+    label = "Container Feed"
+}
