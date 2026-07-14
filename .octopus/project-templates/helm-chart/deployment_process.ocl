@@ -33,3 +33,29 @@ step "create-namespace-if-not-exists" {
         worker_pool_variable = ""
     }
 }
+
+step "deploy-a-helm-chart" {
+    name = "Deploy a Helm Chart"
+    properties = {
+        Octopus.Action.TargetRoles = "#{ProjectTemplate.Helm.Target.Tags}"
+    }
+
+    action {
+        action_type = "Octopus.HelmChartUpgrade"
+        properties = {
+            Octopus.Action.Helm.Namespace = "#{Project.Namespace.Name}"
+            Octopus.Action.Helm.ResetValues = "True"
+            Octopus.Action.Kubernetes.ResourceStatusCheck = "True"
+            Octopus.Action.Script.ScriptSource = "Package"
+        }
+        worker_pool_variable = ""
+
+        packages {
+            acquisition_location = "Server"
+            properties = {
+                PackageParameterName = "ProjectTemplate.Helm.Chart.Package"
+                SelectionMode = "deferred"
+            }
+        }
+    }
+}
