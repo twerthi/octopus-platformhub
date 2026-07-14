@@ -1,7 +1,0 @@
-parameter "Project.Template.Kubernetes.Target.Tag" {
-    display_settings = {
-        Octopus.ControlType = "TargetTags"
-    }
-    help_text = ""
-    label = "Kubernetes Target Tag"
-}
