@@ -13,3 +13,11 @@ parameter "ProjectTemplate.Container.Feed" {
     help_text = "Select the registry for the container image."
     label = "Container Feed"
 }
+
+parameter "ProjectTemplate.Helm.Target.Tags" {
+    display_settings = {
+        Octopus.ControlType = "TargetTags"
+    }
+    help_text = "Enter the target tags for the steps."
+    label = "Target Tags"
+}
