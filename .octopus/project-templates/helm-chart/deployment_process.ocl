@@ -43,7 +43,7 @@ step "deploy-a-helm-chart" {
     action {
         action_type = "Octopus.HelmChartUpgrade"
         properties = {
-            Octopus.Action.Helm.Namespace = "#{Project.Namespace.Name}"
+            Octopus.Action.Helm.Namespace = "#{ProjectTemplate.Namespace.Name}"
             Octopus.Action.Helm.ResetValues = "True"
             Octopus.Action.Helm.TemplateValuesSources = <<-EOT
                 [
