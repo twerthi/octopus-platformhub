@@ -6,14 +6,6 @@ parameter "ProjectTemplate.Helm.Chart.Package" {
     label = "Container Image"
 }
 
-parameter "ProjectTemplate.Container.Feed" {
-    display_settings = {
-        Octopus.ControlType = "Feed"
-    }
-    help_text = "Select the registry for the container image."
-    label = "Container Feed"
-}
-
 parameter "ProjectTemplate.Helm.Target.Tags" {
     display_settings = {
         Octopus.ControlType = "TargetTags"
