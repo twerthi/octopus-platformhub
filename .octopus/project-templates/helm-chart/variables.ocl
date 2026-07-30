@@ -1,15 +1,3 @@
 variable "OctopusPrintVariables" {
     value "true" {}
 }
-
-variable "Project.Host.Name" {
-    value {}
-}
-
-variable "Project.Ingress.Class.Name" {
-    value "traefik" {}
-}
-
-variable "Project.Namespace.Name" {
-    value {}
-}
