@@ -13,3 +13,13 @@ parameter "ProjectTemplate.Helm.Target.Tags" {
     help_text = "Enter the target tags for the steps."
     label = "Helm Target Tags"
 }
+
+parameter "ProjectTemplate.Ingress.Class.Name" {
+    display_settings = {
+        Octopus.ControlType = "SingleLineText"
+    }
+    help_text = "Enter the name of the Ingress Class the deployment requires."
+    label = "Ingress Class Name"
+
+    value "traefik" {}
+}
