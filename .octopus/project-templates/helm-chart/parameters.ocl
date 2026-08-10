@@ -34,6 +34,14 @@ parameter "ProjectTemplate.Git.Service.File.Path" {
     display_settings = {
         Octopus.ControlType = "SingleLineText"
     }
-    help_text = "Enter the git file path for the file to deploy."
-    label = "Git file path"
+    help_text = "Path to the Service YAML file."
+    label = "Service File Path"
+}
+
+parameter "ProjectTemplate.Git.Deployment.File.Path" {
+    display_settings = {
+        Octopus.ControlType = "SingleLineText"
+    }
+    help_text = "Path to the Deployment YAML file."
+    label = "Deployment File Path"
 }
