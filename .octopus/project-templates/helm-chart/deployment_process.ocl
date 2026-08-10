@@ -58,6 +58,7 @@ step "deploy-service" {
         git_dependencies {
             default_branch = "main"
             file_path_filters = ["#{ProjectTemplate.Git.Service.File.Path}"]
+            git_credential_id = "GitCredentials-201"
             git_credential_type = "Library"
             repository_uri = "#{ProjectTemplate.Git.Url}"
         }
@@ -99,6 +100,7 @@ step "deploy-deployment" {
         git_dependencies {
             default_branch = "main"
             file_path_filters = ["#{ProjectTemplate.Git.Deployment.File.Path}"]
+            git_credential_id = "GitCredentials-201"
             git_credential_type = "Library"
             repository_uri = "#{ProjectTemplate.Git.Url}"
         }
