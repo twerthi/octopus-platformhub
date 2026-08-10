@@ -19,7 +19,7 @@ conditions {
                 verify_build_artifacts_skipped if {
                     some step in input.Steps
                     step.Id in input.SkippedSteps
-                    startswith(step.Source.SlugOrId, "dsc-verify-build-artifacts")
+                    startswith(step.Source.SlugOrId, "verify-build-artifacts")
                 }
             EOT
 }
