@@ -1,7 +1,7 @@
 step "create-namespace-if-not-exists" {
     name = "Create namespace if not exists"
     properties = {
-        Octopus.Action.TargetRoles = "#{ProjectTemplate.Helm.Target.Tags}"
+        Octopus.Action.TargetRoles = "#{ProjectTemplate.Target.Tags}"
     }
 
     action {
