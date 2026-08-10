@@ -1,5 +1,5 @@
 name = "test-slack-stuff"
-description = "Process template to perform Flyway deployments to MySQL."
+description = ""
 
 icon {
     color = "#1A77CA"
