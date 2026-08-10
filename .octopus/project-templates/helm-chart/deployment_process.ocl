@@ -75,3 +75,32 @@ step "deploy-service" {
         }
     }
 }
+
+step "deploy-deployment" {
+    name = "Deploy Deployment"
+    properties = {
+        Octopus.Action.TargetRoles = "#{ProjectTemplate.Target.Tags}"
+    }
+
+    action {
+        action_type = "Octopus.KubernetesDeployRawYaml"
+        properties = {
+            Octopus.Action.GitRepository.Source = "External"
+            Octopus.Action.Kubernetes.DeploymentTimeout = "180"
+            Octopus.Action.Kubernetes.ResourceStatusCheck = "True"
+            Octopus.Action.Kubernetes.ServerSideApply.Enabled = "True"
+            Octopus.Action.Kubernetes.ServerSideApply.ForceConflicts = "True"
+            Octopus.Action.KubernetesContainers.CustomResourceYamlFileName = "#{ProjectTemplate.Git.Deployment.File.Path}"
+            Octopus.Action.Package.JsonConfigurationVariablesTargets = "**/*.{yml,yaml}"
+            Octopus.Action.Script.ScriptSource = "GitRepository"
+        }
+        worker_pool_variable = ""
+
+        git_dependencies {
+            default_branch = "main"
+            file_path_filters = ["#{ProjectTemplate.Git.Deployment.File.Path}"]
+            git_credential_type = "Library"
+            repository_uri = "#{ProjectTemplate.Git.Url}"
+        }
+    }
+}
