@@ -21,3 +21,11 @@ parameter "ProjectTemplate.Namespace.Name" {
     help_text = "Enter the namespace that the containers will be deployed to."
     label = "Namespace"
 }
+
+parameter "ProjectTemplate.Git.File.Path" {
+    display_settings = {
+        Octopus.ControlType = "SingleLineText"
+    }
+    help_text = "Enter the git file path for the file to deploy."
+    label = "Git file path"
+}
