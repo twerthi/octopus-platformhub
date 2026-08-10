@@ -29,7 +29,7 @@ scope {
                 package check_for_attestation
                 default evaluate := false
                 evaluate := true if { 
-                    startswith(input.Project.Slug, "demo-policies")
+                    startswith(input.Project.Slug, "demo-policiesx")
                     not input.Runbook
                 }
             EOT
