@@ -30,7 +30,7 @@ parameter "ProjectTemplate.Git.Url" {
     label = "Git Url"
 }
 
-parameter "ProjectTemplate.Git.File.Path" {
+parameter "ProjectTemplate.Git.Service.File.Path" {
     display_settings = {
         Octopus.ControlType = "SingleLineText"
     }
