@@ -62,18 +62,6 @@ step "deploy-service" {
             git_credential_type = "Library"
             repository_uri = "#{ProjectTemplate.Git.Url}"
         }
-
-        packages "ProjectTemplate.Container.Package" {
-            acquisition_location = "NotAcquired"
-            feed = "octopus-server-built-in"
-            package_id = ""
-            properties = {
-                Extract = "false"
-                PackageParameterName = "ProjectTemplate.Container.Package"
-                Purpose = "DockerImageReference"
-                SelectionMode = "deferred"
-            }
-        }
     }
 }
 
@@ -103,6 +91,17 @@ step "deploy-deployment" {
             git_credential_id = "GitCredentials-201"
             git_credential_type = "Library"
             repository_uri = "#{ProjectTemplate.Git.Url}"
+        }
+
+        packages "ProjectTemplate.Container.Package" {
+            acquisition_location = "NotAcquired"
+            package_id = ""
+            properties = {
+                Extract = "false"
+                PackageParameterName = "ProjectTemplate.Container.Package"
+                Purpose = "DockerImageReference"
+                SelectionMode = "deferred"
+            }
         }
     }
 }
