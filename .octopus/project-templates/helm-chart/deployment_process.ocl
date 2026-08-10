@@ -34,39 +34,40 @@ step "create-namespace-if-not-exists" {
     }
 }
 
-step "deploy-a-helm-chart" {
-    name = "Deploy a Helm Chart"
+step "deploy-service" {
+    name = "Deploy Service"
     properties = {
-        Octopus.Action.TargetRoles = "#{ProjectTemplate.Helm.Target.Tags}"
+        Octopus.Action.TargetRoles = "#{ProjectTemplate.Target.Tags}"
     }
 
     action {
-        action_type = "Octopus.HelmChartUpgrade"
-        is_disabled = true
+        action_type = "Octopus.KubernetesDeployRawYaml"
         properties = {
-            Octopus.Action.Helm.Namespace = "#{ProjectTemplate.Namespace.Name}"
-            Octopus.Action.Helm.ResetValues = "True"
-            Octopus.Action.Helm.TemplateValuesSources = <<-EOT
-                [
-                  {
-                    "Type": "InlineYaml",
-                    "Value": "image:\n  repository: #{Octopus.Action.Package[octopub-frontend].PackageId}\n  tag: #{Octopus.Action.Package[octopub-frontend].PackageVersion}"
-                  }
-                ]
-                EOT
+            Octopus.Action.GitRepository.Source = "External"
+            Octopus.Action.Kubernetes.DeploymentTimeout = "180"
             Octopus.Action.Kubernetes.ResourceStatusCheck = "True"
-            Octopus.Action.Script.ScriptSource = "Package"
+            Octopus.Action.Kubernetes.ServerSideApply.Enabled = "True"
+            Octopus.Action.Kubernetes.ServerSideApply.ForceConflicts = "True"
+            Octopus.Action.KubernetesContainers.Namespace = "#{ProjectTemplate.Namespace.Name}"
+            Octopus.Action.Package.JsonConfigurationVariablesTargets = "**/*.{yml,yaml}"
+            Octopus.Action.Script.ScriptSource = "GitRepository"
         }
         worker_pool_variable = ""
 
-        packages {
-            acquisition_location = "Server"
-            feed = "octopus-server-built-in"
+        git_dependencies {
+            default_branch = "main"
+            git_credential_type = "Library"
+            repository_uri = "https://github.com/OctopusSolutionsEngineering/Octopub.git"
+        }
+
+        packages "ProjectTemplate.Container.Package" {
+            acquisition_location = "NotAcquired"
             package_id = ""
             properties = {
-                PackageParameterName = "ProjectTemplate.Helm.Chart.Package"
+                Extract = "false"
+                PackageParameterName = "ProjectTemplate.Container.Package"
+                Purpose = "DockerImageReference"
                 SelectionMode = "deferred"
-                ValuesFilePath = ""
             }
         }
     }
