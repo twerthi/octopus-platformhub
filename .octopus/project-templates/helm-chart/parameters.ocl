@@ -22,6 +22,14 @@ parameter "ProjectTemplate.Namespace.Name" {
     label = "Namespace"
 }
 
+parameter "ProjectTemplate.Git.Url" {
+    display_settings = {
+        Octopus.ControlType = "SingleLineText"
+    }
+    help_text = "Url to the git repo to use."
+    label = "Git Url"
+}
+
 parameter "ProjectTemplate.Git.File.Path" {
     display_settings = {
         Octopus.ControlType = "SingleLineText"
