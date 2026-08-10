@@ -1,4 +1,4 @@
-name = "Helm Chart"
+name = "Kubernetes Template"
 description = ""
 
 icon {
