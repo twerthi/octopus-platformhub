@@ -48,7 +48,7 @@ step "deploy-service" {
             Octopus.Action.Kubernetes.ResourceStatusCheck = "True"
             Octopus.Action.Kubernetes.ServerSideApply.Enabled = "True"
             Octopus.Action.Kubernetes.ServerSideApply.ForceConflicts = "True"
-            Octopus.Action.KubernetesContainers.CustomResourceYamlFileName = "#{ProjectTemplate.Git.File.Path}"
+            Octopus.Action.KubernetesContainers.CustomResourceYamlFileName = "#{ProjectTemplate.Git.Service.File.Path}"
             Octopus.Action.KubernetesContainers.Namespace = "#{ProjectTemplate.Namespace.Name}"
             Octopus.Action.Package.JsonConfigurationVariablesTargets = "**/*.{yml,yaml}"
             Octopus.Action.Script.ScriptSource = "GitRepository"
@@ -57,7 +57,7 @@ step "deploy-service" {
 
         git_dependencies {
             default_branch = "main"
-            file_path_filters = ["#{ProjectTemplate.Git.File.Path}"]
+            file_path_filters = ["#{ProjectTemplate.Git.Service.File.Path}"]
             git_credential_type = "Library"
             repository_uri = "#{ProjectTemplate.Git.Url}"
         }
