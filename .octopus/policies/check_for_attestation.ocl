@@ -7,7 +7,7 @@ conditions {
                 default result := {"allowed": false}
             
                 result := {"allowed": true} if {
-                    startswith(input.Steps[0].Source.SlugOrId, "dsc-verify-build-artifacts")
+                    startswith(input.Steps[0].Source.SlugOrId, "verify-build-artifacts")
                     input.Steps[0].Enabled == true
                     not verify_build_artifacts_skipped
                 }
