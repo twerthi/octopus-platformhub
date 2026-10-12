@@ -2,7 +2,7 @@ name = "MySQL-Flyway"
 description = "Process template to perform Flyway deployments to MySQL."
 
 icon {
-    color = "#1A77CA"
+    color = "#D63D3D"
     id = "database"
 }
 
