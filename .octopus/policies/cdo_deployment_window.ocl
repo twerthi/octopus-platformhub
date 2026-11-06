@@ -1,0 +1,45 @@
+name = "CDO deployment window"
+description = "Checks CDO deployment creation time against weekdays 09:00 inclusive until 17:00 exclusive UTC: warn in RnD-Interop-NA, block in RnD-PSR-NA. Does not enforce actual start time."
+violation_action = "block"
+violation_reason = "CDO deployment creation time is outside Monday-Friday 09:00 inclusive to 17:00 exclusive UTC, or is unavailable/invalid. This policy does not check actual start time."
+
+conditions {
+    rego = <<-EOT
+        package cdo_deployment_window
+
+        default result := {"allowed": false, "action": "block"}
+
+        result := {"allowed": true} if {
+            within_window
+        }
+
+        result := {"allowed": false, "action": "warn"} if {
+            input.Environment.Slug == "rnd-interop-na"
+            not within_window
+        }
+
+        within_window if {
+            started_at := time.parse_rfc3339_ns(input.CreatedAt)
+            weekday := time.weekday(started_at)
+            weekday in ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+            clock := time.clock(started_at)
+            clock[0] >= 9
+            clock[0] < 17
+        }
+    EOT
+}
+
+scope {
+    rego = <<-EOT
+        package cdo_deployment_window
+
+        default evaluate := false
+
+        evaluate if {
+            input.Space.Slug == "infrastructure"
+            input.Project.Slug == "plat-cd-ms-infra"
+            input.Environment.Slug in ["rnd-interop-na", "rnd-psr-na"]
+            not input.Runbook
+        }
+    EOT
+}
